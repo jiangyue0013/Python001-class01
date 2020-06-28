@@ -13,7 +13,8 @@ class MaoyanItem(scrapy.Item):
     # name = scrapy.Field()
     pass
 
+
 class MaoyanTop10Item(scrapy.Item):
     name = scrapy.Field()
     released_time = scrapy.Field()
-    score = scrapy.Field()
+    movie_type = scrapy.Field()

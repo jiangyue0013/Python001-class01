@@ -3,7 +3,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 
 
-headers ={
+headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
     'Accept-Encoding': 'gzip, deflate, br',
     'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
@@ -20,21 +20,29 @@ headers ={
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36 Edg/83.0.478.54'
 }
 
-myurl = 'https://maoyan.com/board/4'
-response = requests.get(myurl, headers=headers)
-
+my_url = 'https://maoyan.com/films?showType=3'
+response = requests.get(my_url, headers=headers)
 
 soup = BeautifulSoup(response.text, 'html.parser')
 
-movielist = []
+movie_list = []
 
-for movie in soup.find_all('div', attrs={'class': 'board-item-content'}):
-    name = movie.find('a').text
-    released_time = movie.find('p', attrs={'class': 'releasetime'}).text
-    score = movie.find('i', attrs={'class': 'integer'}).text + movie.find('i', attrs={'class': 'fraction'}).text
+for movie in soup.find_all('div', attrs={'class': 'channel-detail movie-item-title'})[0:10]:
+    # print(movie)
+    movie_url = 'https://maoyan.com' + movie.find('a').get('href')
+    movie_response = requests.get(movie_url, headers=headers)
+    movie_soup = BeautifulSoup(movie_response.text, 'html.parser')
+    movie_info = movie_soup.find('div', attrs={'class': 'movie-brief-container'})
+    name = movie_info.find('h1').text
+    time_and_type = movie_info.find_all('li')
+    released_time = time_and_type[2].text
+    movie_types = ''
+    for movie_type in time_and_type[0].find_all('a'):
+        movie_types += movie_type.text + " "
 
-    movielist.append([name, released_time, score])
+    movie_list.append([name, movie_types, released_time])
 
-movies = pd.DataFrame(data=movielist)
+
+movies = pd.DataFrame(data=movie_list)
 movies.to_csv('./maoyantop10.csv', encoding='gbk', header=False, index=False)
-    
+
