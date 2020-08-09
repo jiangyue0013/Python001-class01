@@ -1,0 +1,13 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Comment</title>
+    </head>
+    <body>
+        {% for comment in comments %}
+            <div>星级：{{ comment.stars }}</div>
+            <div>短评：{{ comment.short }}</div>
+            <hr>
+        {% endfor %}
+    </body>
+</html>
